@@ -36,64 +36,34 @@ void UTCprobA()
 }
 
 //UTC PROBLEM B
-void sortB(int *array, int low, int high, char *str)
-{
-    if (low < high)
-    {
-        int middle = low + (high - low) / 2, i, j, k;
-        sortB(array, low, middle, str); sortB(array, middle + 1, high, str); 
-        int leftSize = middle - low + 1, rightSize = high - middle;
-        int *leftArray = (int*)malloc(leftSize * sizeof(int));
-        int *rightArray = (int*)malloc(rightSize * sizeof(int));
-        for (i = 0; i < leftSize; i++) leftArray[i] = array[low + i];
-        for (j = 0; j < rightSize; j++) rightArray[j] = array[middle + 1 + j];
-        i = 0, j = 0, k = low;
-        while (i < leftSize && j < rightSize)
-        {
-            if (strcmp(str + leftArray[i], str + rightArray[j]) <= 0) { array[k] = leftArray[i]; i++; }
-            else { array[k] = rightArray[j]; j++; } k++;
-        }
-        while (i < leftSize) { array[k] = leftArray[i]; i++; k++; }
-        while (j < rightSize) { array[k] = rightArray[j]; j++; k++; }
-    }
-}
-int *kasaiB(char *str, int *suffixarray, int length)
-{
-    int *lcp = (int*)malloc(length * sizeof(int));
-    int *invSuff = (int*)malloc(length * sizeof(int));
-    int i, k = 0;
-    for (i = 0; i < length; i++) invSuff[suffixarray[i]] = i;
-    for (i = 0; i < length; i++)
-    {
-        if (invSuff[i] == length) { k = 0; continue; }
-        int j = suffixarray[invSuff[i] + 1];
-        while (i + k < length && j + k < length && str[i + k] == str[j + k]) k++;
-        lcp[invSuff[i]] = k;
-        if (k > 0) k--;
-    }
-    return lcp;
-}
 void UTCprobB()
 {
     char input[1005]; gets(input);
-    int length = strlen(input), suffixarray[1005] = {0}, i, j, k;
-    for (i = 0; i < length; i++) suffixarray[i] = i;
-    sortB(suffixarray, 0, length - 1, input);
-    int *lcp = kasaiB(input, suffixarray, length), result = length - suffixarray[0];
-    printf("Suffix\tLCP\n");
-    for (i = 0; i < length; i++) printf("%d\t%d\n", suffixarray[i], lcp[i]);
-    for (i = 1; i < length; i++) result += length - suffixarray[i] - lcp[i - 1];
-    printf("Unique Substring: %d\n", result);
-    printf("There are:\n");
-    for (i = 0; i < length; i++)
+    int length = strlen(input), alphabet[26], result = 0;
+    memset(alphabet, 0, sizeof(alphabet));
+    for (int i = 0; i < length; i++)
     {
-        for (j = 0; j < length - suffixarray[i]; j++)
+        if (alphabet[input[i] - 97] == 0)
         {
-            char temp[1005] = {0};
-            strncpy(temp, input + suffixarray[i], j + 1);
-            printf("%s\n", temp);
+            alphabet[input[i] - 97] = 1; result++;
         }
     }
+    for (int i = 2; i < length; i++)
+    {
+        for (int j = 0; j < length - i + 1; j++)
+        {
+            int left = j, right = j + i, status = 1;
+            while (left < right)
+            {
+                if (input[left++] != input[right--])
+                {
+                    status = 0; break;
+                }
+            }
+            if (status) result++;
+        }
+    }
+    printf("%d\n", result);
 }
 
 //UTC PROBLEM C
@@ -288,4 +258,4 @@ void UACprobD()
 }
 
 //EXECUTION
-int main() { UACprobD(); return 0; }
+int main() { UTCprobB(); return 0; }
